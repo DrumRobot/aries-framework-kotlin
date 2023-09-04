@@ -1,9 +1,9 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'org.jetbrains.kotlin.plugin.serialization' version '1.8.10'
+    id 'org.jetbrains.kotlin.plugin.serialization' version '1.3.72'
     id "org.jlleitschuh.gradle.ktlint" version '11.4.2'
-    id 'de.undercouch.download' version '5.4.0'
+    id 'de.undercouch.download' //version '5.4.0'
 }
 
 task downloadIndyLibs(type: Download) {
@@ -23,7 +23,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        minSdk 24
+        minSdk 21
         targetSdk 33
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"

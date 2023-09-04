@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace 'org.hyperledger.ariesproject'
-    compileSdk 33
+//    namespace 'org.hyperledger.ariesproject'
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "org.hyperledger.ariesproject"
-        minSdk 24
-        targetSdk 33
+        minSdkVersion 21
+        targetSdkVersion 33
         versionCode 1
         versionName "1.0"
 
