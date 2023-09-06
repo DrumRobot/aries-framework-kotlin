@@ -23,9 +23,15 @@ import org.hyperledger.ariesframework.credentials.models.AcceptOfferOptions
 import org.hyperledger.ariesframework.credentials.models.AutoAcceptCredential
 import org.hyperledger.ariesframework.credentials.models.CredentialState
 import org.hyperledger.ariesframework.proofs.models.ProofState
+import org.hyperledger.ariesproject.api.Data
+import org.hyperledger.ariesproject.api.JSONServer
 import org.hyperledger.ariesproject.databinding.ActivityWalletMainBinding
 import org.hyperledger.ariesproject.databinding.MenuItemListContentBinding
 import org.hyperledger.ariesproject.menu.MainMenu
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+import retrofit2.awaitResponse
 
 class WalletMainActivity : AppCompatActivity() {
 
@@ -44,10 +50,10 @@ class WalletMainActivity : AppCompatActivity() {
         setupRecyclerView(binding.menuItemList.itemList)
         waitForAgentInitialize()
 
+        val app = application as WalletApp
         binding.invitation.setOnEditorActionListener { _, _, _ ->
             val invitation = binding.invitation.text.toString()
             if (invitation.isNotEmpty()) {
-                val app = application as WalletApp
                 lifecycleScope.launch(Dispatchers.Main) {
                     try {
                         val (_, connection) = app.agent.oob.receiveInvitationFromUrl(invitation)
@@ -100,6 +106,11 @@ class WalletMainActivity : AppCompatActivity() {
             lifecycleScope.launch(Dispatchers.Main) {
                 showAlert(it.message)
             }
+        }
+        lifecycleScope.launch {
+            val url = app.jsonServer.url("INVITATION_URL").awaitResponse().body()!!.value
+            val (_, connection) = app.agent!!.oob.receiveInvitationFromUrl(url)
+            showAlert("Connected to ${connection?.theirLabel ?: "unknown agent"}")
         }
     }
 

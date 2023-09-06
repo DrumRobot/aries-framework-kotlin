@@ -45,6 +45,13 @@ android {
     kotlinOptions {
         jvmTarget = '11'
     }
+    packagingOptions {
+        excludes += ["**/libc++_shared.so",
+                     "**/libfbjni.so",
+                     "**/libjsi.so",
+                     "**/libreactnativejni.so",
+                     "**/libjscexecutor.so"]
+    }
     publishing {
         singleVariant("release") {
             withSourcesJar()

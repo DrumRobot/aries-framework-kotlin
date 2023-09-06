@@ -10,6 +10,7 @@ import okhttp3.OkHttpClient
 import org.hyperledger.ariesframework.agent.Agent
 import org.hyperledger.ariesframework.agent.AgentConfig
 import org.hyperledger.ariesframework.agent.MediatorPickupStrategy
+import org.hyperledger.ariesframework.agent.WsOutboundTransport
 import org.hyperledger.ariesframework.credentials.models.AutoAcceptCredential
 import org.hyperledger.ariesframework.proofs.models.AutoAcceptProof
 import org.hyperledger.ariesframework.wallet.Wallet
@@ -27,7 +28,7 @@ class WalletApp : Application() {
     var walletOpened: Boolean = false
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://es6.kr/")
+        .baseUrl("http://dev.willkomo.com:6248")
         .addConverterFactory(GsonConverterFactory.create())
         .client(OkHttpClient())
         .build()
@@ -51,6 +52,7 @@ class WalletApp : Application() {
             copyResourceFile(genesisPath)
         }
 
+//        val invitationUrl = "https://22ff-121-153-39-164.ngrok-free.app/?c_i=eyJAdHlwZSI6ICJodHRwczovL2RpZGNvbW0ub3JnL2Nvbm5lY3Rpb25zLzEuMC9pbnZpdGF0aW9uIiwgIkBpZCI6ICIwZThjZjRkMy05Y2U4LTQ2YjUtYjFiYi1mMmZiMTU4MWFlYjAiLCAibGFiZWwiOiAiTWVkaWF0b3IiLCAicmVjaXBpZW50S2V5cyI6IFsiQVhWN3Nkc3Y1TFBETWFKZlVjOXBTWU0xWWo4eTl3dThlUjdSVXF2VTdvbXAiXSwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwczovLzIyZmYtMTIxLTE1My0zOS0xNjQubmdyb2stZnJlZS5hcHAifQ==" // ktlint-disable max-line-length
         // val invitationUrl = URL("http://10.0.2.2:3001/invitation").readText() // This uses local AFJ mediator and needs MediatorPickupStrategy.PickUpV1
         val config = AgentConfig(
             walletKey = key,
