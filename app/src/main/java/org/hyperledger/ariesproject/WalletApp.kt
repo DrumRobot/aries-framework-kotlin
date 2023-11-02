@@ -6,12 +6,17 @@ import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 import org.hyperledger.ariesframework.agent.Agent
 import org.hyperledger.ariesframework.agent.AgentConfig
 import org.hyperledger.ariesframework.agent.MediatorPickupStrategy
 import org.hyperledger.ariesframework.credentials.models.AutoAcceptCredential
 import org.hyperledger.ariesframework.proofs.models.AutoAcceptProof
 import org.hyperledger.ariesframework.wallet.Wallet
+import org.hyperledger.ariesproject.api.JSONServer
+import retrofit2.Retrofit
+import retrofit2.awaitResponse
+import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 
 const val PREFERENCE_NAME = "aries-framework-kotlin-sample"
@@ -21,6 +26,13 @@ class WalletApp : Application() {
     lateinit var agent: Agent
     var walletOpened: Boolean = false
 
+    private val retrofit: Retrofit = Retrofit.Builder()
+        .baseUrl("http://192.168.42.5:3000/")
+        .addConverterFactory(GsonConverterFactory.create())
+        .client(OkHttpClient())
+        .build()
+    val jsonServer: JSONServer = retrofit.create(JSONServer::class.java)
+
     private fun copyResourceFile(resource: String) {
         val inputStream = applicationContext.assets.open(resource)
         val file = File(applicationContext.filesDir.absolutePath, resource)
@@ -29,7 +41,7 @@ class WalletApp : Application() {
         }
     }
 
-    private suspend fun openWallet() {
+    private suspend fun openWallet(invitationUrl: String) {
         val pref = applicationContext.getSharedPreferences(PREFERENCE_NAME, 0)
         var key = pref.getString("walletKey", null)
 
@@ -39,7 +51,6 @@ class WalletApp : Application() {
             copyResourceFile(genesisPath)
         }
 
-        val invitationUrl = "https://public.mediator.indiciotech.io?c_i=eyJAdHlwZSI6ICJkaWQ6c292OkJ6Q2JzTlloTXJqSGlxWkRUVUFTSGc7c3BlYy9jb25uZWN0aW9ucy8xLjAvaW52aXRhdGlvbiIsICJAaWQiOiAiMDVlYzM5NDItYTEyOS00YWE3LWEzZDQtYTJmNDgwYzNjZThhIiwgInNlcnZpY2VFbmRwb2ludCI6ICJodHRwczovL3B1YmxpYy5tZWRpYXRvci5pbmRpY2lvdGVjaC5pbyIsICJyZWNpcGllbnRLZXlzIjogWyJDc2dIQVpxSktuWlRmc3h0MmRIR3JjN3U2M3ljeFlEZ25RdEZMeFhpeDIzYiJdLCAibGFiZWwiOiAiSW5kaWNpbyBQdWJsaWMgTWVkaWF0b3IifQ==" // ktlint-disable max-line-length
         // val invitationUrl = URL("http://10.0.2.2:3001/invitation").readText() // This uses local AFJ mediator and needs MediatorPickupStrategy.PickUpV1
         val config = AgentConfig(
             walletKey = key,
@@ -55,13 +66,18 @@ class WalletApp : Application() {
 
         walletOpened = true
         Log.d("demo", "Agent initialized")
+
+        val url = jsonServer.url("INVITATION_URL").awaitResponse().body()!!.value
+        val (_, connection) = agent.oob.receiveInvitationFromUrl(url)
+        Log.d("demo", "Connected to ${connection?.theirLabel ?: "unknown agent"}")
     }
 
     override fun onCreate() {
         super.onCreate()
 
         GlobalScope.launch(Dispatchers.IO) {
-            openWallet()
+            val res = jsonServer.url("MEDIATOR_URL").awaitResponse()
+            openWallet(res.body()!!.value)
         }
     }
 
