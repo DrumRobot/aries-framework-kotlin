@@ -58,8 +58,8 @@ class WalletApp : Application() {
             mediatorConnectionsInvite = invitationUrl,
             mediatorPickupStrategy = MediatorPickupStrategy.Implicit,
             label = "SampleApp",
-            autoAcceptCredential = AutoAcceptCredential.Never,
-            autoAcceptProof = AutoAcceptProof.Never,
+            autoAcceptCredential = AutoAcceptCredential.Always,
+            autoAcceptProof = AutoAcceptProof.Always,
         )
         agent = Agent(applicationContext, config)
         agent.initialize()
