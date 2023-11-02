@@ -97,7 +97,7 @@ open class Repository<T : BaseRecord>(private val type: KClass<T>, val agent: Ag
     }
 
     private suspend fun search(type: String, query: String, limit: Int = Int.MAX_VALUE): List<WalletRecord> {
-        var recordJson: String?
+        val recordJson: String?
         try {
             val search = WalletSearch.open(wallet.indyWallet, type, query, DEFAULT_QUERY_OPTIONS).await()
             recordJson = search.fetchNextRecords(wallet.indyWallet, limit).await()

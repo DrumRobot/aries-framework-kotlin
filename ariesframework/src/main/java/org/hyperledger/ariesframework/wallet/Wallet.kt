@@ -1,5 +1,6 @@
 package org.hyperledger.ariesframework.wallet
 
+import android.annotation.SuppressLint
 import kotlinx.coroutines.future.await
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -24,6 +25,7 @@ data class DidInfo(
     val verkey: String,
 )
 
+@SuppressLint("ApplySharedPref")
 class Wallet(private val agent: Agent) {
     private val walletExistKey = agent.agentConfig.label + " aries_framework_wallet_exist"
     private val secretIdKey = agent.agentConfig.label + " aries_framework_wallet_secret_id_key"

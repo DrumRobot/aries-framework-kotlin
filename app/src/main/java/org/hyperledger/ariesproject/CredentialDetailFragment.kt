@@ -24,7 +24,7 @@ class CredentialDetailFragment : Fragment() {
 
         arguments?.let {
             if (it.containsKey(ARG_CREDENTIAL)) {
-                item = JSONObject(it.getString(ARG_CREDENTIAL))
+                item = JSONObject(it.getString(ARG_CREDENTIAL)!!)
                 detailBinding = ActivityCredentialDetailBinding.inflate(layoutInflater)
                 detailBinding.toolbarLayout.title = getString(R.string.title_credential_detail)
             }

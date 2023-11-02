@@ -30,7 +30,6 @@ class WalletMainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityWalletMainBinding
     private var credentialProgress: ProgressDialog? = null
     private var proofProgress: ProgressDialog? = null
-    private val TAG = "WalletMainActivity"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,7 +40,7 @@ class WalletMainActivity : AppCompatActivity() {
         binding.toolbar.title = title
 
         setupRecyclerView(binding.menuItemList.itemList)
-        waitForAgentInitialze()
+        waitForAgentInitialize()
 
         binding.invitation.setOnEditorActionListener { _, _, _ ->
             val invitation = binding.invitation.text.toString()
@@ -97,7 +96,7 @@ class WalletMainActivity : AppCompatActivity() {
         // Show an alert on basic message, this is useful for debugging.
         app.agent.eventBus.subscribe<AgentEvents.BasicMessageEvent> {
             lifecycleScope.launch(Dispatchers.Main) {
-                showAlert("${it.message}")
+                showAlert(it.message)
             }
         }
     }
@@ -125,7 +124,7 @@ class WalletMainActivity : AppCompatActivity() {
         runOnConfirm(message, action) {}
     }
 
-    private fun waitForAgentInitialze() {
+    private fun waitForAgentInitialize() {
         val app = application as WalletApp
         val progress = ProgressDialog(this)
         progress.setTitle("Initializing agent")
@@ -273,8 +272,7 @@ class WalletMainActivity : AppCompatActivity() {
     ) : RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.MenuItemHolder>() {
 
         private val onClickListener: View.OnClickListener = View.OnClickListener { v ->
-            val menu = v.tag as MainMenu
-            when (menu) {
+            when (v.tag as MainMenu) {
                 MainMenu.GET -> {
                     val intent = Intent(v.context, BarcodeScannerActivity::class.java)
                     (v.context as Activity).startActivityForResult(intent, 0)
@@ -307,5 +305,9 @@ class WalletMainActivity : AppCompatActivity() {
         inner class MenuItemHolder(val binding: MenuItemListContentBinding) : RecyclerView.ViewHolder(binding.root) {
             val contentView: TextView = binding.content
         }
+    }
+
+    companion object {
+        const val TAG = "WalletMainActivity"
     }
 }
