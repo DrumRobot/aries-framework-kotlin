@@ -41,7 +41,7 @@ class LedgerService(val agent: Agent) {
                 Pool.createPoolLedgerConfig(agent.agentConfig.poolName, poolConfig)
             } catch (e: Exception) {
                 logger.error("Cannot create pool: ${e.message}")
-                throw Exception("Pool creation failed. config=$poolConfig")
+                throw Exception("Pool creation failed. config=$poolConfig", e)
             }
         }
 
@@ -49,7 +49,7 @@ class LedgerService(val agent: Agent) {
             indyPool = Pool.openPoolLedger(agent.agentConfig.poolName, poolConfig).await()
         } catch (e: Exception) {
             logger.error("Cannot open pool: ${e.message}")
-            throw Exception("Pool opening failed. config=$poolConfig")
+            throw Exception("Pool opening failed. config=$poolConfig", e)
         }
     }
 
