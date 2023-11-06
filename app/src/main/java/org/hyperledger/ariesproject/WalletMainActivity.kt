@@ -5,7 +5,6 @@ import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
-import android.os.CountDownTimer
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +13,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 import org.hyperledger.ariesframework.agent.AgentEvents
 import org.hyperledger.ariesframework.credentials.models.AcceptOfferOptions
 import org.hyperledger.ariesframework.credentials.models.AutoAcceptCredential
@@ -131,28 +133,36 @@ class WalletMainActivity : AppCompatActivity() {
         progress.setCancelable(false)
         progress.show()
 
-        val timer = object : CountDownTimer(20000, 1000) {
-            override fun onTick(millisUntilFinished: Long) {
-                if (app.walletOpened) {
-                    subscribeEvents()
-                    // This causes a crash:
-                    // java.lang.IllegalArgumentException: View=DecorView@39d4aa3[Initializing agent] not attached to window manager
-                    // for now we just catch the exception
+        lifecycleScope.launch(Dispatchers.IO) {
+            val job = launch {
+                val walletOpened = withTimeoutOrNull(20000) {
+                    while (!app.walletOpened) {
+                        // Delay for 1 second and check the walletOpened condition
+                        delay(1000)
+                    }
+                    true
+                }
+                if (walletOpened == null) {
+                    // Timeout occurred
+                    lifecycleScope.launch(Dispatchers.Main) {
+                        showAlert("Failed to open a wallet.")
+                    }
+                }
+            }
+
+            job.invokeOnCompletion { throwable ->
+                lifecycleScope.launch(Dispatchers.Main) {
                     try {
                         progress.dismiss()
                     } catch (e: Exception) {
                         Log.d(TAG, e.message ?: "Unknown error")
                     }
-                    cancel()
+                }
+                if (throwable is CancellationException) {
+                    // Handle job cancellation, e.g., show an alert.
                 }
             }
-
-            override fun onFinish() {
-                progress.dismiss()
-                showAlert("Failed to open a wallet.")
-            }
         }
-        timer.start()
     }
 
     private fun declineCredential(id: String) {

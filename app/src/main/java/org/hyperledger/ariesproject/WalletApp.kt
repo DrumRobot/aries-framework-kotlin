@@ -20,14 +20,14 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.File
 
 const val PREFERENCE_NAME = "aries-framework-kotlin-sample"
-const val genesisPath = "genesis.txn"
+const val genesisPath = "test-genesis.txn"
 
 class WalletApp : Application() {
     lateinit var agent: Agent
     var walletOpened: Boolean = false
 
     private val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl("http://192.168.42.5:3000/")
+        .baseUrl("http://es6.kr/")
         .addConverterFactory(GsonConverterFactory.create())
         .client(OkHttpClient())
         .build()
