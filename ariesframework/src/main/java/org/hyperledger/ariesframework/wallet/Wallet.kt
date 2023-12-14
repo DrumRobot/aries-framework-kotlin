@@ -141,8 +141,9 @@ class Wallet(private val agent: Agent) {
         /**
          * Generate wallet master key using "RAW" key derivation method.
          */
-        suspend fun generateKey(): String {
-            return IndyWallet.generateWalletKey(null).await()
+        suspend fun generateKey(seed: String? = null): String {
+            val config = seed?.let { Json.encodeToString(mapOf("seed" to it)) }
+            return IndyWallet.generateWalletKey(config).await()
         }
     }
 }
