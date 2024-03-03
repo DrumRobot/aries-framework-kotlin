@@ -33,12 +33,15 @@ android {
     buildFeatures {
         viewBinding true
     }
+    packagingOptions {
+        exclude 'META-INF/INDEX.LIST'
+    }
 }
 
 dependencies {
-    implementation project(path: ':ariesframework')
-//    implementation("org.hyperledger:aries-framework-kotlin:2.1.0")
-    implementation("org.hyperledger:anoncreds_uniffi:0.1.1-wrapper.1")
+//    implementation project(path: ':ariesframework')
+    implementation("org.hyperledger:aries-framework-kotlin:2.4.1")
+//    implementation("org.hyperledger:anoncreds_uniffi:0.1.1-wrapper.1")
 
     implementation 'com.otaliastudios:cameraview:2.7.2'
     implementation 'com.google.firebase:firebase-ml-vision:24.0.1'
